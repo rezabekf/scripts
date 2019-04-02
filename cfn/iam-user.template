@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create user for programatic access and store access keys in SSM parameter store
+
+Parameters:
+  IAMUserName:
+    Type: String
+    Description: IAM user name
+
+Resources:
+  IAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref IAMUserName
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  IAMAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName:
+        !Ref IAMUser
+
+  SecretManagerSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: !Ref IAMUser
+      Description: !Sub Access Key and SecretAccessKey for ${IAMUser}
+      SecretString: !Sub '{"username": "${IAMAccessKey}", "password": "${IAMAccessKey.SecretAccessKey}"}'
+      Tags:
+        - Key: Name
+          Value: !Ref IAMUser

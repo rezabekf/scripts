@@ -3,10 +3,11 @@
 # get all the AWS regions
 regions=$(aws ec2 describe-regions --query Regions[].RegionName | jq '.[]' -r)
 
-# go through all the AWS regions and grab Ubuntu 18.04 LTS AMI ID
+# go through all the AWS regions and grab CentOS 7 AMI ID
 while read -r line; do
     printf "${line}\n$(aws ec2 describe-images \
-        --filters Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64* \
+        --owners 'aws-marketplace' \
+        --filters 'Name=product-code,Values=aw0evgkw8e5c1q413zgy5pjce' \
         --query 'Images[*].[ImageId,CreationDate]' \
         --region ${line} \
         --output text | \

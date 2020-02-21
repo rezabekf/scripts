@@ -3,7 +3,7 @@
 import argparse
 import boto3
 
-client = boto3.client('logs')
+client = boto3.client('logs', region_name='us-east-1')
 
 
 def parse_args():

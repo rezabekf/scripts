@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: This template creates a cross account role with administrator managed policy.
+
+Parameters:
+  OtherAccountNumber:
+    AllowedPattern: '[0-9]+'
+    Description: The 12 digit AWS account number to grant access to.
+    MaxLength: 12
+    MinLength: 12
+    Type: String
+
+Resources:
+  CrossAccountAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:aws:iam::'
+                  - !Ref OtherAccountNumber
+                  - :root
+            Sid: 'CrossAccountAdminAccess'
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+Outputs:
+  RoleARN:
+    Description: The ARN of the role that can be assumed by the other account.
+    Value: !GetAtt CrossAccountAccessRole.Arn
